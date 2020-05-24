@@ -68,7 +68,6 @@ struct SpeciesDetail: View {
                     Image("iucnCatagory")
                         .resizable()
                         .scaledToFit()
-                        .padding(.bottom)
                    
                     ForEach(self.species.detailText, id: \.self) { text -> AnyView in
                         if text.match(pattern: .image) {
@@ -81,15 +80,16 @@ struct SpeciesDetail: View {
                             return AnyView(
                                 Text(text.strip())
                                 .foregroundColor(Color.gray)
-                                .padding(.bottom, 12)
                                 .font(.custom("Baskerville", size: 16))
                             )
                         } else {
                             return AnyView(
                                 Text("　" + text)
-                                .padding(.bottom, 12)
+                                .padding(.top, 18)
                                 .font(.custom("Baskerville", size: 20))
-                                .lineSpacing(12))
+                                .lineSpacing(12)
+                                .fixedSize(horizontal: false, vertical: true)
+                            )
                         }
                     }
                     
@@ -98,10 +98,6 @@ struct SpeciesDetail: View {
                         Text("もっと詳しく")
                     }
                     .padding(.vertical)
-                    Spacer()
-                        
-                    
-                    
                         
                 }
                 .padding()

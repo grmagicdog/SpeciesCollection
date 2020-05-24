@@ -29,6 +29,6 @@ struct Species: Hashable, Codable, Identifiable {
 
 extension Species {
     var image: Image {
-        ImageStore.shared.image(name: imageName)
+        Image(imageName)
     }
 }
