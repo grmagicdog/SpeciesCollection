@@ -84,7 +84,7 @@ struct ConcentrateView: View {
         }
         //新規入手のアラート
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("\(self.userData.speciess[newDataIndex].jpnName)を入手ました"),
+            Alert(title: Text("\(self.userData.speciess[newDataIndex].jpnName)を入手しました"),
                   message: Text("すぐチェックしますか？"),
                   //左ボタン：何もしない
                   primaryButton: .cancel(Text("後で")),
