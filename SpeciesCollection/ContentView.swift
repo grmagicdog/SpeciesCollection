@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selection = 0
+    @EnvironmentObject var userData: UserData
  
     var body: some View {
-        TabView(selection: $selection){
+        TabView(selection: $userData.tabSelection){
             ConcentrateView()
                 .tabItem {
                     VStack {

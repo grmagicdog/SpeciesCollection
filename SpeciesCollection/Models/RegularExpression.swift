@@ -9,23 +9,21 @@
 import Foundation
 
 extension String {
-  func match(pattern:RegexPattern) -> Bool {
-    let pattern = pattern.rawValue
-    let regex = try! NSRegularExpression(pattern:pattern)
-    return regex.firstMatch(in:self, range:NSRange(self.startIndex..., in:self)) != nil
-  }
-
-  func extractAll(pattern:RegexPattern) -> [String] {
-    let pattern = pattern.rawValue
-    let regex = try! NSRegularExpression(pattern:pattern)
-    return regex.matches(in:self, range:NSRange(self.startIndex..., in:self)).map { String(self[Range($0.range, in:self)!]) }
-  }
-
-  func strip() -> String {
-    return self.replacingOccurrences(of:"</?\\w+>", with:"", options:NSString.CompareOptions.regularExpression, range:self.range(of:self))
-  }
+    //正規表現の一致判断
+    func match(pattern:RegexPattern) -> Bool {
+        let pattern = pattern.rawValue
+        let regex = try! NSRegularExpression(pattern:pattern)
+        return regex.firstMatch(in:self, range:NSRange(self.startIndex..., in:self)) != nil
+    }
+    
+    //両端のタグの削除
+    func strip() -> String {
+        let lstrip = self.replacingOccurrences(of:"^<\\w+>", with:"", options:NSString.CompareOptions.regularExpression, range:self.range(of:self))
+        return lstrip.replacingOccurrences(of:"</\\w+>$", with:"", options:NSString.CompareOptions.regularExpression, range:lstrip.range(of:lstrip))
+    }
 }
 
+//タグの定義
 enum RegexPattern: String {
     case image = "^<image>.*</image>$"
     case caption = "^<caption>.*</caption>$"

@@ -11,12 +11,6 @@ import SwiftUI
 struct SpeciesDetail: View {
     @EnvironmentObject var userData: UserData
     var species: Species
-    
-    var speciesIndex: Int {
-        userData.speciess.firstIndex(where: {
-            $0.id == species.id
-        })!
-    }
 
     var body: some View {
         ScrollView {
@@ -25,7 +19,6 @@ struct SpeciesDetail: View {
                     .resizable()
                     .scaledToFit()
                 
-                
                 VStack(alignment: .leading) {
                     HStack {
                         Text(species.family)
@@ -33,38 +26,45 @@ struct SpeciesDetail: View {
                             
                         Text(species.genus)
                             .foregroundColor(.blue)
+                        
                         Spacer()
                     }
+                    
                     HStack {
                         Text(species.jpnName)
                             .font(.custom("MarketFelt-Wide", size: 34))
                             
                         Button(action: {
-                            self.userData.speciess[self.speciesIndex].isFavorite.toggle()
-                            update(self.userData.speciess, to: "speciesData.json")
+                            self.userData.status[self.species.statusIndex].isFavorite.toggle()
+                            update(self.userData.status, to: "speciesStatus.json")
                         }) {
-                            if self.userData.speciess[self.speciesIndex].isFavorite {
+                            if self.userData.status[self.species.statusIndex].isFavorite {
                                 Image(systemName: "star.fill")
                                     .foregroundColor(.yellow)
                                     .imageScale(.large)
                             }
                             else {
                                 Image(systemName: "star")
-                                .foregroundColor(.gray)
-                                .imageScale(.large)
+                                    .foregroundColor(.gray)
+                                    .imageScale(.large)
                             }
                         }
                     }
+                    
                     HStack {
                         Text(species.binomen)
                             .font(.custom("TimesNewRomanPS-ItalicMT", size: 20))
+                        
                         Spacer()
+                        
                         Text(species.name)
                             .font(.custom("TimesNewRomanPSMT", size: 20))
                     }
+                    
                     Text("保全状況：\(species.iucnCatagory)")
                         .foregroundColor(.red)
                         .padding(.top)
+                    
                     Image("iucnCatagory")
                         .resizable()
                         .scaledToFit()
@@ -95,16 +95,21 @@ struct SpeciesDetail: View {
                     
                     NavigationLink(destination: SpeciesWiki(species: species)) {
                         Spacer()
+                        
                         Text("もっと詳しく")
                     }
                     .padding(.vertical)
-                        
                 }
                 .padding()
             }
-            
         }
         .navigationBarTitle(Text(species.jpnName), displayMode: .inline)
+        .onAppear {
+            if self.userData.status[self.species.statusIndex].isNew {
+                self.userData.status[self.species.statusIndex].isNew = false
+                update(self.userData.status, to: "speciesStatus.json")
+            }
+        }
     }
 }
 

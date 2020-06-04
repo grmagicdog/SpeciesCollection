@@ -10,15 +10,15 @@ import SwiftUI
 
 struct CollectionView: View {
     @EnvironmentObject var userData: UserData
-    
+        
     var body: some View {
         NavigationView {
             List {
-                Toggle(isOn: $userData.showFavoritesOnly) { Text("お気に入りフィルター")}
+                Toggle(isOn: $userData.showFavoritesOnly) { Text("お気に入りのみ")}
                 
                 ForEach(userData.speciess) { species in
-                    if species.isUnlocked &&
-                        (!self.userData.showFavoritesOnly || species.isFavorite) {
+                    if self.userData.status[species.statusIndex].isUnlocked &&
+                        (!self.userData.showFavoritesOnly || self.userData.status[species.statusIndex].isFavorite) {
                         NavigationLink(destination: SpeciesDetail(species: species)) {
                             SpeciesRow(species: species)
                         }

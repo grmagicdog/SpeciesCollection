@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct SpeciesRow: View {
+    @EnvironmentObject var userData: UserData
     var species: Species
     var body: some View {
         HStack {
@@ -19,10 +20,14 @@ struct SpeciesRow: View {
                 .clipped()
             Text(species.jpnName)
             Spacer()
-            if species.isFavorite {
+            if userData.status[species.statusIndex].isFavorite {
                 Image(systemName: "star.fill")
                     .imageScale(.medium)
                     .foregroundColor(.yellow)
+            } else if userData.status[species.statusIndex].isNew {
+                Text("新規")
+                    .foregroundColor(Color.blue)
+                    .font(.custom("HelveticaNeue-Medium", size: 18))
             }
         }
     }
@@ -31,5 +36,6 @@ struct SpeciesRow: View {
 struct SpeciesRow_Previews: PreviewProvider {
     static var previews: some View {
         SpeciesRow(species: speciesData[1])
+            .environmentObject(UserData())
     }
 }
