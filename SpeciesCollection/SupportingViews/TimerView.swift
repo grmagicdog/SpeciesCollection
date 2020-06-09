@@ -14,7 +14,6 @@ struct TimerView: View {
     var body: some View {
         Text(String(format: "%2d : %.2d : %.2d", time.hour, time.minute, time.second))
             .font(.system(size: 70))
-            .frame(height: 248)
     }
 }
 

@@ -13,6 +13,7 @@ struct TimeSetterView: View {
     
     var body: some View {
         HStack {
+            //時設置
             Picker(selection: $userData.setTime.hour, label: Text("1"), content: {
                 ForEach(0..<24) {
                     Text(String($0))
@@ -22,9 +23,12 @@ struct TimeSetterView: View {
                 .frame(width: 80.0)
                 .clipped()
                 .labelsHidden()
+            
             Text("時間")
-            .font(.title)
+                .font(.title)
                 .fontWeight(.medium)
+            
+            //分設置
             Picker(selection: $userData.setTime.minute, label: Text("1"), content: {
                 ForEach(0..<60) {
                     Text(String($0))
@@ -34,12 +38,11 @@ struct TimeSetterView: View {
                 .frame(width: 80.0)
                 .clipped()
                 .labelsHidden()
+            
             Text("分")
                 .font(.title)
                 .fontWeight(.medium)
-                
-            }
-        .padding()
+        }
     }
 }
 

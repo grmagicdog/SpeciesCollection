@@ -14,12 +14,36 @@ struct ConcentrateView: View {
     //スイッチ変数
     @State var timerEnabled = false
     @State var showAlert = false
+    @State var isAllUnlocked = false
     
     //動的テキストのボタン
-    var SwitchButtonText: Text{
+    var SwitchButtonText: Text {
         Text(!timerEnabled ? "開始" : "取り消し")
     }
     
+    //充分な設置時間？
+    var isTimeEnough: Bool {
+        userData.setTime.hour > 0 || userData.setTime.minute >= 15
+    }
+    
+    //動的イントロダクションテキスト
+    var introductionText: Text {
+        var text: Text
+        if idLocked.count == 0 {
+            text = Text("全生物を入手しました\nおめでとう！")
+                .foregroundColor(.red)
+        } else if isTimeEnough {
+            text = Text("最後まで集中して\n新しい生物と出会いましょう")
+            .foregroundColor(.green)
+        } else {
+            text = Text("一度15分未満の場合は\n新しい生物の取得ができません")
+            .foregroundColor(.red)
+        }
+        return text
+            
+            
+    }
+
     @State var timer: Timer?
     @State var newDataIndex: Int!
     
@@ -27,11 +51,20 @@ struct ConcentrateView: View {
         VStack {
             Spacer()
             
+            introductionText
+                .frame(width: 300)
+                .font(.system(size: 20, weight: .regular, design: .default))
+                .multilineTextAlignment(.center)
+                .lineSpacing(8)
+                .padding()
+                
             if self.timerEnabled {
                 TimerView(time: self.userData.remainedTime)
+                    .frame(height: 300)
             }
             else {
                 TimeSetterView()
+                    .frame(height: 285)
             }
             
             Spacer()
@@ -39,41 +72,59 @@ struct ConcentrateView: View {
         //delete this when debug finished⬇️
             VStack {
         //delete this when debug finished⬆️
-                    Button(action: {
-                        self.timerEnabled.toggle()
+            //スイッチボタン
+            Button(action: {
+                self.timerEnabled.toggle()
                         
-                        if self.timerEnabled {
-                            self.userData.remainedTime = self.userData.setTime
+                if self.timerEnabled {
+                    //設置時間を取得
+                    self.userData.remainedTime = self.userData.setTime
+                    
+                    //１秒刻みのタイマー
+                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
+                        if self.userData.remainedTime.timeUp {
+                            //タイムアップ
+                            timer.invalidate()
                             
-                            //１秒刻みのタイマー
-                            self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
-                                if self.userData.remainedTime.timeUp {
-                                    //タイムアップ
-                                    timer.invalidate()
-                                    self.unlockSpecies()
-                                    self.timerEnabled = false
-                                } else {
-                                    //カウントダウン
-                                    self.userData.remainedTime.second -= 1
-                                }
+                            if self.isTimeEnough {
+                                self.unlockSpecies()
+                            } else {
+                                self.isAllUnlocked = idLocked.count == 0
                             }
+                            
+                            self.showAlert = true
+                            self.timerEnabled = false
                         } else {
-                            self.timer?.invalidate()
+                            //カウントダウン
+                            self.userData.remainedTime.second -= 1
                         }
-                    }) {
-                        SwitchButtonText
-                            .font(.largeTitle)
                     }
-                    .disabled(userData.setTime.hour == 0 && userData.setTime.minute == 0)
+                } else {
+                    self.timer?.invalidate()
+                }
+            }) {
+                SwitchButtonText
+                    .font(.largeTitle)
+            }
+            .disabled(userData.setTime.hour == 0 && userData.setTime.minute == 0)
             //delete this when debug finished⬇️
                 HStack {
-                    Button(action: unlockSpecies) {
-                        Text("Debug Unlock")
+                    Button(action: {
+                        if self.isTimeEnough {
+                            self.unlockSpecies()
+                        } else {
+                            self.isAllUnlocked = idLocked.count == 0
+                        }
+                        
+                        self.showAlert = true
+                    }) {
+                        Text("Debug TimeUp")
+                            .multilineTextAlignment(.center)
                     }
                     .padding()
+                    
                     Button(action: {
                         update([Status](), to: "speciesStatus.json")
-                        
                     }) {
                         Text("Reset")
                     }
@@ -82,16 +133,29 @@ struct ConcentrateView: View {
             //delete this when debug finished⬆️
             Spacer()
         }
-        //新規入手のアラート
+        //タイムアップのアラート
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("\(self.userData.speciess[newDataIndex].jpnName)を入手しました"),
-                  message: Text("すぐチェックしますか？"),
-                  //左ボタン：何もしない
-                  primaryButton: .cancel(Text("後で")),
-                  //右ボタン：コレクションを表示
-                  secondaryButton: .default(Text("OK"), action: {
-                    self.userData.tabSelection = 1
-                  }))
+            if self.isAllUnlocked {
+                return Alert(title: Text("全生物を入手しています"),
+                message: Text("アップデートをご期待ください！"),
+                dismissButton: .default(Text("OK"))
+                )
+                
+            } else if self.isTimeEnough {
+                return Alert(title: Text("新規：\(self.userData.speciess[newDataIndex].jpnName)"),
+                message: Text("すぐチェックしますか？"),
+                //左ボタン：何もしない
+                primaryButton: .cancel(Text("後で")),
+                //右ボタン：コレクションを表示
+                secondaryButton: .default(Text("チェック"), action: {
+                  self.userData.tabSelection = 1
+                }))
+            } else {
+                return Alert(title: Text("お疲れ様です"),
+                message: Text("今度は15分以上の集中で新しい生物と出会いましょう！"),
+                dismissButton: .default(Text("OK"))
+                )
+            }
         }
     }
     
@@ -99,6 +163,7 @@ struct ConcentrateView: View {
     func unlockSpecies() {
         //残りからランダムで一つ選択
         guard let id = idLocked.randomElement() else {
+            self.isAllUnlocked = true
             return
         }
         
@@ -111,7 +176,6 @@ struct ConcentrateView: View {
         
         //新規入手のアラートを表示
         self.newDataIndex = getIndex(for: .data, id: id)
-        self.showAlert = true
     }
 }
 
