@@ -6,7 +6,7 @@
 
 ## App Icon
 
-<img src="https://user-images.githubusercontent.com/48979946/84115859-b9941880-aa69-11ea-9fe8-a5f51fed0d80.png" height=180>
+<img src="https://user-images.githubusercontent.com/48979946/84115859-b9941880-aa69-11ea-9fe8-a5f51fed0d80.png" height=60>
 生物種ウチュウ
 
 ## Visuals
