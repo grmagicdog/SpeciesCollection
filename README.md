@@ -1,4 +1,4 @@
-# SpeciesCollection(仮)
+# iOSアプリ　生物種ウチュウ
 
 ### 開発中のものです！
 
