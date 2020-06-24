@@ -59,19 +59,16 @@ struct ConcentrateView: View {
                 .padding()
                 
             if self.timerEnabled {
-                TimerView(time: self.userData.remainedTime)
+                TimeRemained(time: self.userData.remainedTime)
                     .frame(height: 300)
             }
             else {
-                TimeSetterView()
+                TimeSetter()
                     .frame(height: 285)
             }
             
             Spacer()
             
-        //delete this when debug finished⬇️
-            VStack {
-        //delete this when debug finished⬆️
             //スイッチボタン
             Button(action: {
                 self.timerEnabled.toggle()
@@ -107,30 +104,7 @@ struct ConcentrateView: View {
                     .font(.largeTitle)
             }
             .disabled(userData.setTime.hour == 0 && userData.setTime.minute == 0)
-            //delete this when debug finished⬇️
-                HStack {
-                    Button(action: {
-                        if self.isTimeEnough {
-                            self.unlockSpecies()
-                        } else {
-                            self.isAllUnlocked = idLocked.count == 0
-                        }
-                        
-                        self.showAlert = true
-                    }) {
-                        Text("Debug TimeUp")
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                    
-                    Button(action: {
-                        update([Status](), to: "speciesStatus.json")
-                    }) {
-                        Text("Reset")
-                    }
-                }
-            }
-            //delete this when debug finished⬆️
+
             Spacer()
         }
         //タイムアップのアラート

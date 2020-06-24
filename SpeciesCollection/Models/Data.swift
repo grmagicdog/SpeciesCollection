@@ -91,16 +91,6 @@ func loadStatus<T: Decodable>(_ filename: String) -> T {
     
     let fileManager = FileManager.default
     
-    /* delete old file in sandbox to reset (debug)
-    if fileManager.fileExists(atPath: dataUrl.path) {
-        do {
-            try fileManager.removeItem(at: dataUrl)
-        } catch {
-            fatalError("Couldn't remove \(dataUrl):\n\(error)")
-        }
-    }
-    //end debug*/
-    
     //ファイルがない時、空配列を返す
     if !fileManager.fileExists(atPath: dataUrl.path) {
         return [] as! T
